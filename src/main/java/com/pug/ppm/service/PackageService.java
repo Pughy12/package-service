@@ -19,8 +19,9 @@ public interface PackageService {
     List<Package> getAllPackages();
 
     // update
-    Package updatePackage(String id, Package newPackage);
+    void updatePackage(String id, Package newPackage);
 
     // delete
-    void deletePackage(String id);
+    boolean deletePackage(String id);
+    boolean deleteAllPackages();
 }

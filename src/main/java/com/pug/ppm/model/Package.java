@@ -1,24 +1,34 @@
 package com.pug.ppm.model;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Mike on 07/09/2017.
  */
 public class Package {
 
+    @NotNull
     private String id;
+    @NotNull
     private String name;
+    @NotNull
     private String description;
+    @NotNull
     private List<Product> products;
     private double price;
 
-    public Package(String id, String name, String description, List<Product> products, double price) {
+    private Package() {
+        // Damn you Jackson and always tripping me up with this
+    }
+
+    public Package(String id, String name, String description, List<Product> products) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.products = products;
-        this.price = price;
+        this.price = getPriceFromProducts(products);
     }
 
     public String getId() {
@@ -59,5 +69,20 @@ public class Package {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    private static double getPriceFromProducts(List<Product> products) {
+        return products.stream().collect(Collectors.summingDouble(Product::getUsdPrice));
+    }
+
+    @Override
+    public String toString() {
+        return "Package{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", products=" + products +
+                ", price=" + price +
+                '}';
     }
 }

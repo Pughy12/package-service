@@ -7,12 +7,16 @@ public class Product {
 
     private String id;
     private String name;
-    private int price;
+    private int usdPrice;
+
+    private Product() {
+        // Damn you Jackson and always tripping me up with this
+    }
 
     public Product(String id, String name, int usdPrice) {
         this.id = id;
         this.name = name;
-        this.price = usdPrice;
+        this.usdPrice = usdPrice;
     }
 
     public String getId() {
@@ -31,11 +35,20 @@ public class Product {
         this.name = name;
     }
 
-    public int getPrice() {
-        return price;
+    public int getUsdPrice() {
+        return usdPrice;
     }
 
-    public void setPrice(int price) {
-        this.price = price;
+    public void setUsdPrice(int usdPrice) {
+        this.usdPrice = usdPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", usdPrice=" + usdPrice +
+                '}';
     }
 }
