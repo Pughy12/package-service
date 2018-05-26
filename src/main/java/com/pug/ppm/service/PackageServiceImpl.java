@@ -63,7 +63,7 @@ public class PackageServiceImpl implements PackageService {
             .ifPresent(p -> packagesList.remove(p));
 
         // add the new package
-        packagesList.add(newPackage);
+        packagesList.add(new Package(newPackage.getId(), newPackage.getName(), newPackage.getDescription(), newPackage.getProducts()));
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.lang.invoke.MethodHandles;
@@ -64,9 +65,10 @@ public class PackageController {
 
         final Package createdPackage = packageService.createPackage(pkg.getId(), pkg.getName(), pkg.getDescription(), pkg.getProducts());
 
-        // TODO: Clean this up so it gets the location in a nicer way
         if (createdPackage != null) {
-            return ResponseEntity.created(new URI("http://localhost:8080/packages/" + createdPackage.getId())).build();
+            final URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(pkg.getId()).toUri();
+            return ResponseEntity.created(location).build();
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
@@ -79,7 +81,7 @@ public class PackageController {
 
         if (p == null) {
             logger.error("Unable to delete. Package with id '{}' not found.", id);
-            return new ResponseEntity<>(new CustomErrorMessage("Unable to update. Package with id " + id + " not found."),
+            return new ResponseEntity<>(new CustomErrorMessage("Unable to delete. Package with id " + id + " not found."),
                     HttpStatus.NOT_FOUND);
         }
 
@@ -88,7 +90,8 @@ public class PackageController {
         if (result) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(new CustomErrorMessage("Unable to delete. Package with id " + id + " not found."),
+                    HttpStatus.NOT_FOUND);
         }
     }
 
@@ -103,8 +106,8 @@ public class PackageController {
         }
     }
 
-    @PutMapping
-    public ResponseEntity updatePackage(@Valid @RequestBody Package pkg, BindingResult result) {
+    @PutMapping("/packages/{id}")
+    public ResponseEntity updatePackage(@PathVariable String id, @Valid @RequestBody Package pkg, BindingResult result) {
 
         // Return 400 if request is bad
         if (result.hasErrors()) {
@@ -112,15 +115,15 @@ public class PackageController {
         }
 
         // Return 404 if package isn't available to update at all
-        final Package p = packageService.getPackageById(pkg.getId());
+        final Package p = packageService.getPackageById(id);
 
         if (p == null) {
-            logger.error("Unable to update. Package with id '{}' not found.", pkg.getId());
-            return new ResponseEntity<>(new CustomErrorMessage("Unable to update. Package with id " + pkg.getId() + " not found."),
+            logger.error("Unable to update. Package with id '{}' not found.", id);
+            return new ResponseEntity<>(new CustomErrorMessage("Unable to update. Package with id " + id + " not found."),
                     HttpStatus.NOT_FOUND);
         }
 
-        packageService.updatePackage(pkg.getId(), pkg);
+        packageService.updatePackage(id, pkg);
 
         return ResponseEntity.ok().build();
     }
